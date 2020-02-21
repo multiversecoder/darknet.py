@@ -180,7 +180,7 @@ class Darknet:
             subprocess.call(shlex.split("/bin/ip link set {} up".format(interface)))
             print("{} MAC Addresses changed for interface: {} => {} ".format(self._timer, interface, macaddr))
             print("{} Reloading Network Manager".format(self._timer))
-            subprocess.call(shlex.split("/etc/init.d/networking reload"))
+            subprocess.call(shlex.split("systemctl reload NetworkManager"))
             time.sleep(10)
         print("[done]")
 
@@ -264,7 +264,7 @@ class Darknet:
         print("[done]")
         time.sleep(10)
         print("{} Reloading Network Manager".format(self._timer))
-        subprocess.call(shlex.split("/etc/init.d/networking reload"))
+        subprocess.call(shlex.split("systemctl reload NetworkManager"))
         time.sleep(10)
         print("{} Resetting TOR Service".format(self._timer))
         subprocess.call(shlex.split("systemctl restart tor.service"))
