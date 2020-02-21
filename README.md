@@ -12,6 +12,10 @@ To run darknet.py you need TOR.
 
 Install TOR with your package manager.
 
+NetworkManager is a mandatory requirement for the use of darknet.py
+
+Install NetworkManager with your package manager.
+
 ## How Can I Install darknet.py on Linux?
 Download
 
