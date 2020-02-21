@@ -28,26 +28,42 @@ In the darknet.py folder use the ./install.sh to install the software
 ## Usage
 
 usage: 
+
     normal mode
-        ./darknet --start --torid 104
+    
+       ./darknet --start --torid 104
+    
     stealth mode
+    
         ./darknet --stealth --torid 104 --ifaces [enp1s0]
+    
     stopping
+    
         ./darknet --stop
 
 NOTES:
+    
     <interface(s)> shold be added as python list [wlo1, ...]
 
 DISCLAIMER:
+    
     The author of this software assumes no responsibility for the use of this software to perform actions that do not comply with the law or damage property or individuals.
     Using this software you take full responsibility for your actions.
 
 optional arguments:
+  
   -h, --help       show this help message and exit
+
   --start          Starts the transparent proxy
+
   --stealth        Changes MAC Address and Starts the transparent proxy
+
   --stop           Stop the execution and reset configurations
+
   --torrc TORRC    The location of torrc config file
+
   --torid TORID    The TOR Process ID
+
   --port PORT      The tor service port
+
   --ifaces IFACES  Add interfaces to change mac address
