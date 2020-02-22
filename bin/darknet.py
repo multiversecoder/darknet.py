@@ -20,11 +20,11 @@ from urllib.request import urlopen
 
 USAGE = """
     normal mode
-        ./darknet --start --torid 104
+        $ darknet.py --start --torid 104
     stealth mode
-        ./darknet --stealth --torid 104 --ifaces [enp1s0]
+        $ darknet.py --stealth --torid 104 --ifaces [enp1s0]
     stopping
-        ./darknet --stop
+        $ darknet.py --stop
 
 NOTES:
     <interface(s)> should be added as python list [wlo1, ...]
@@ -71,27 +71,33 @@ class Darknet:
 
         v1.0 - https://github.com/multiversecode/darknet.py
         Using this software you take full responsibility for your actions
-        run ./darknet -h to see help, full disclaimer or usage
+        run darknet.py -h to see help, full disclaimer or usage
         """
         signal.signal(signal.SIGINT, self.__handle_sigint)
         self.__check_if_tor_installed()
 
     def __check_if_linux(self) -> None:
         if "linux" not in sys.platform:
-            raise UnsupportedOS("You need a linux distro tu run this program")
+            raise UnsupportedOS("You need a Linux distro to run this program")
+    
+    def __sel(self, en: int) -> bool:
+        if bool(shutil.which("setenforce")) is not False:
+            subprocess.call(shlex.split("setenforce {}".format(en)))
+            return True
+        return False
 
     def __check_if_tor_installed(self) -> None:
         if bool(shutil.which("tor")) is False:
-            raise TORNotInstalled("tor not installed... Please install tor to get it on your system")
+            raise TORNotInstalled("TOR not installed... Please install TOR to get it on your system")
 
     def __handle_sigint(self, signum, frame):
-        print('\n Shutting Down Darknet\n')
-        print("{} [info] shutting down darknet[tor]\n\n".format(self._timer))
+        print('\nKeyBoard Interrupt Detected\nShutting Down Darknet\n')
+        print("{} [info] shutting down darknet.py\n\n".format(self._timer))
         self.stop()
         sys.exit(1)
 
     @property
-    def __has_internet_connection(self):
+    def __has_internet_connection(self) -> bool:
         while True:
             try:
                 urlopen('https://check.torproject.org/', timeout=1)
@@ -103,58 +109,64 @@ class Darknet:
     @property
     def __check_ip_addr(self)-> str:
         if self.__has_internet_connection and self.has_tor:
-            return "Tor is enabled\n {}".format(subprocess.getoutput("curl -s https://check.torproject.org/ | cat | grep -m 1 IP | xargs | sed 's/<[^>]*>//g'"))
+            return "TOR is enabled\n {}".format(
+                    subprocess.getoutput(
+                        "curl -s https://check.torproject.org/ | cat | grep -m 1 IP | xargs | sed 's/<[^>]*>//g'")
+                    )
         elif self.__has_internet_connection and not self.has_tor:
-            return "Tor is disabled\nYour IP address appears to be: {}".format(subprocess.getoutput("curl -s ipinfo.io/ip"))
+            return "TOR is disabled\nYour IP address appears to be: {}".format(subprocess.getoutput("curl -s ipinfo.io/ip"))
 
     @property
     def _timer(self):
         return "[{}]".format(time.strftime('%H:%M:%S', time.localtime()))
 
-    def __set_iptables_rules(self, torid: int, tport: int = None, nontor: str = "192.168.1.0/24") -> str:
+    def __set_iptables_rules(self, torid: int, tport: int = None, nontor: str = "10.0.0.0/8 172.16.0.0/12 192.168.0.0/16") -> str:
         return """
-        /usr/sbin/iptables -F
-        /usr/sbin/iptables -t nat -F
-        /usr/sbin/iptables -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
-        /usr/sbin/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
-        for NET in {nontor} 127.0.0.0/9 127.128.0.0/10; do
-            /usr/sbin/iptables -t nat -A OUTPUT -d $NET -j RETURN
-        done
-        /usr/sbin/iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports {tport}
-        /usr/sbin/iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-        for NET in {nontor} 127.0.0.0/8; do
-            /usr/sbin/iptables -A OUTPUT -d $NET -j ACCEPT
-        done
-        /usr/sbin/iptables -A OUTPUT -m owner --uid-owner {torid} -j ACCEPT
-        /usr/sbin/iptables -A OUTPUT -j REJECT""".format(
-            torid=torid,
-            tport=tport if tport is not None else 9040,
-            nontor=nontor
-        )
+            /usr/sbin/iptables -F
+            /usr/sbin/iptables -t nat -F
+            /usr/sbin/iptables -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
+            /usr/sbin/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
+            for NET in {nontor} 127.0.0.0/8 127.128.0.0/10; do
+                /usr/sbin/iptables -t nat -A OUTPUT -d $NET -j RETURN
+            done
+            /usr/sbin/iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports {tport}
+            /usr/sbin/iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+            for NET in {nontor} 127.0.0.0/8; do
+                /usr/sbin/iptables -A OUTPUT -d $NET -j ACCEPT
+            done
+            /usr/sbin/iptables -A OUTPUT -m owner --uid-owner {torid} -j ACCEPT
+            /usr/sbin/iptables -A OUTPUT -j REJECT""".format(
+                torid=torid,
+                tport=tport if tport is not None else 9040,
+                nontor=nontor
+            )
 
 
-    def __unset_iptables_rules(self) -> str:
+    def __unset_iptables_rules(self) -> str: 
         return """
-        /usr/sbin/iptables -P INPUT ACCEPT
-        /usr/sbin/iptables -P FORWARD ACCEPT
-        /usr/sbin/iptables -P OUTPUT ACCEPT
-        /usr/sbin/iptables -t nat -F
-        /usr/sbin/iptables -t mangle -F
-        /usr/sbin/iptables -F
-        /usr/sbin/iptables -X
+            /usr/sbin/iptables -P INPUT ACCEPT
+            /usr/sbin/iptables -P FORWARD ACCEPT
+            /usr/sbin/iptables -P OUTPUT ACCEPT
+            /usr/sbin/iptables -t nat -F
+            /usr/sbin/iptables -t mangle -F
+            /usr/sbin/iptables -F
+            /usr/sbin/iptables -X
         """
 
     def __torrc_file(self, tport: int) -> str:
         return inspect.cleandoc("""
                 # THIS FILE IS GENERATED BY
                 #       DARKNET.PY
-
+                AvoidDiskWrites 1
+                GeoIPFile /usr/local/share/tor/geoip
+                GeoIPv6File /usr/local/share/tor/geoip6
                 VirtualAddrNetwork 10.0.0.0/10
                 AutomapHostsOnResolve 1
-                TransPort {tport} IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort
-                TransListenAddress 127.0.0.1
-                DNSPort 53
-                DNSListenAddress 127.0.0.1
+                ExcludeNodes {{AU}}, {{CA}}, {{US}}, {{NZ}}, {{GB}}, {{DK}}, {{FR}}, {{NL}}, {{NO}}, {{BE}}, {{DE}}, {{IT}}, {{ES}}, {{SE}}
+                NodeFamily {{AU}}, {{CA}}, {{US}}, {{NZ}}, {{GB}}, {{DK}}, {{FR}}, {{NL}}, {{NO}}, {{BE}}, {{DE}}, {{IT}}, {{ES}}, {{SE}}
+                StrictNodes 1
+                TransPort {tport} #IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort
+                DNSPort 53 
         """.format(
                 tport=tport if tport is not None else 9040
             )
@@ -205,7 +217,7 @@ class Darknet:
         with open("/etc/tor/torrc") as torrc_old:
             torrc_old = torrc_old.read()
         if torrc == torrc_old:
-            print("{} Torrc file already configured".format(self._timer))
+            print("{} torrc file already configured".format(self._timer))
         else:
             print("{} Backup torrc file => /etc/tor/torrc.orig".format(self._timer))
             self.__backup_old_torrc()
@@ -234,7 +246,7 @@ class Darknet:
         "curl -s https://check.torproject.org/ | cat | grep -m 1 Congratulations | xargs")
         if "Congratulations" in status_message:
             return True
-        elif "Sorry. You are not using Tor" in status_message:
+        elif "Sorry. You are not using TOR" in status_message:
             return False
         else:
             return False
@@ -245,20 +257,21 @@ class Darknet:
     def start(self, torid: int, torrc: str = None, port: int = None) -> None:
         self.__torrc_config(torrc, port)
         self.__resolv_config
-        print("{} Starting tor service...".format(self._timer))
+        print("{} Starting TOR service...".format(self._timer))
         self.restart_tor()
         time.sleep(3)
         print("[done]")
-        print("{} setting up iptables rules".format(self._timer))
+        print("{} Setting Up Firewall Rules".format(self._timer))
         iptables = self.__set_iptables_rules(torid=torid, tport=port)
         _ = subprocess.check_output(iptables, shell=True)
         time.sleep(10)
         print("[done]")
+        print("{} Checking the IP Address Obtained from TOR".format(self._timer))
         print(self.__check_ip_addr)
 
     def stop(self) -> None:
-        print("{} STOPPING darknet[tor]".format(self._timer), end=" ")
-        print("{} Flushing iptables, resetting to default:\n".format(self._timer), end=" ")
+        print("{} STOPPING darknet.py".format(self._timer), end=" ")
+        print("{} Flushing Firewall, resetting to default:\n".format(self._timer), end=" ")
         flush = self.__unset_iptables_rules()
         _ = subprocess.check_output(flush, shell=True)
         print("[done]")
@@ -267,7 +280,7 @@ class Darknet:
         subprocess.call(shlex.split("systemctl reload NetworkManager"))
         time.sleep(10)
         print("{} Resetting TOR Service".format(self._timer))
-        subprocess.call(shlex.split("systemctl restart tor.service"))
+        self.restart_tor()
         time.sleep(1)
         print("{} Fetching current status and IP...".format(self._timer))
         print("[done]")
@@ -280,6 +293,8 @@ class Darknet:
         torrc = args.torrc
         port = args.port
         if args.start is True:
+            print("[{}] Checking for SELinux".format(self._timer))
+            print("SELinux Disabled Temporarily") if self.__sel(0) else print("SELinux not Found!")
             if args.torid is not None:
                 torid = args.torid
             else:
@@ -287,6 +302,8 @@ class Darknet:
             time.sleep(1)
             self.start(torid=torid, torrc=args.torrc, port=port)
         if args.stealth is True:
+            print("[{}] Checking for SELinux".format(self._timer))
+            print("SELinux Disabled Temporarily") if self.__sel(0) else print("SELinux not Found!")
             if args.torid is not None:
                 torid = args.torid
             else:
@@ -299,6 +316,8 @@ class Darknet:
                 raise MissingInterfacesForStealthMode("To change mac address you need to pass a list of interfaces to the command")
         if args.stop is True:
             self.stop()
+            print("[{}] Checking for SELinux...".format(self._timer))
+            print("SELinux Enabled") if self.__sel(1) else print("SELinux not Found!")
 
 
 if __name__ == "__main__":
