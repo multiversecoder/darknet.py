@@ -27,7 +27,7 @@ USAGE = """
         ./darknet --stop
 
 NOTES:
-    <interface(s)> shold be added as python list [wlo1, ...]
+    <interface(s)> should be added as python list [wlo1, ...]
 
 DISCLAIMER:
     The author of this software assumes no responsibility for the use of this software to perform actions that do not comply with the law or damage property or individuals.
@@ -69,7 +69,7 @@ class Darknet:
          / /_// (_| | |  |   <| | | |  __/ |_
         /___,' \__,_|_|  |_|\_\_| |_|\___|\__| .py
 
-        v1.0 - https://github.com/multiversecode/darknet
+        v1.0 - https://github.com/multiversecode/darknet.py
         Using this software you take full responsibility for your actions
         run ./darknet -h to see help, full disclaimer or usage
         """
