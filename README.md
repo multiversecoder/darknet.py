@@ -47,7 +47,7 @@ usage:
 
 NOTES:
     
-    <interface(s)> shold be added as python list [wlo1, ...]
+    <interface(s)> should be added as python list [wlo1, ...]
 
 DISCLAIMER:
     
