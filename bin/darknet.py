@@ -76,6 +76,10 @@ class Darknet:
         signal.signal(signal.SIGINT, self.__handle_sigint)
         self.__check_if_tor_installed()
 
+    def __ntpsync(self) -> None:
+        #subprocess.call(shlex.split("sudo ntpdate -s time.nist.gov"))
+        pass
+
     def __check_if_linux(self) -> None:
         if "linux" not in sys.platform:
             raise UnsupportedOS("You need a Linux distro to run this program")
@@ -120,22 +124,23 @@ class Darknet:
     def _timer(self):
         return "[{}]".format(time.strftime('%H:%M:%S', time.localtime()))
 
-    def __set_iptables_rules(self, torid: int, tport: int = None, nontor: str = "10.0.0.0/8 172.16.0.0/12 192.168.0.0/16") -> str:
+    def __set_iptables_rules(self, torid: int, tport: int = None,
+            nontor: str = "0.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12  203.0.113.0/24 224.0.0.0/4 240.0.0.0/4 255.255.255.255/32 192.0.0.0/24 192.0.2.0/24 192.168.0.0/16 192.88.99.0/24 198.18.0.0/15 198.51.100.0/24") -> str:
         return """
-            /usr/sbin/iptables -F
-            /usr/sbin/iptables -t nat -F
-            /usr/sbin/iptables -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
-            /usr/sbin/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
-            for NET in {nontor} 127.0.0.0/8 127.128.0.0/10; do
-                /usr/sbin/iptables -t nat -A OUTPUT -d $NET -j RETURN
-            done
-            /usr/sbin/iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports {tport}
-            /usr/sbin/iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-            for NET in {nontor} 127.0.0.0/8; do
-                /usr/sbin/iptables -A OUTPUT -d $NET -j ACCEPT
-            done
-            /usr/sbin/iptables -A OUTPUT -m owner --uid-owner {torid} -j ACCEPT
-            /usr/sbin/iptables -A OUTPUT -j REJECT""".format(
+        /usr/sbin/iptables -F
+        /usr/sbin/iptables -t nat -F
+        /usr/sbin/iptables -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
+        /usr/sbin/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
+        for NET in {nontor}; do
+            /usr/sbin/iptables -t nat -A OUTPUT -d $NET -j RETURN
+        done
+        /usr/sbin/iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports {tport}
+        /usr/sbin/iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+        for NET in {nontor}; do
+            /usr/sbin/iptables -A OUTPUT -d $NET -j ACCEPT
+        done
+        /usr/sbin/iptables -A OUTPUT -m owner --uid-owner {torid} -j ACCEPT
+        /usr/sbin/iptables -A OUTPUT -j REJECT""".format(
                 torid=torid,
                 tport=tport if tport is not None else 9040,
                 nontor=nontor
@@ -160,13 +165,13 @@ class Darknet:
                 AvoidDiskWrites 1
                 GeoIPFile /usr/local/share/tor/geoip
                 GeoIPv6File /usr/local/share/tor/geoip6
-                VirtualAddrNetwork 10.0.0.0/10
+                VirtualAddrNetworkIPv4 10.0.0.0/10
                 AutomapHostsOnResolve 1
                 ExcludeNodes {{AU}}, {{CA}}, {{US}}, {{NZ}}, {{GB}}, {{DK}}, {{FR}}, {{NL}}, {{NO}}, {{BE}}, {{DE}}, {{IT}}, {{ES}}, {{SE}}
                 NodeFamily {{AU}}, {{CA}}, {{US}}, {{NZ}}, {{GB}}, {{DK}}, {{FR}}, {{NL}}, {{NO}}, {{BE}}, {{DE}}, {{IT}}, {{ES}}, {{SE}}
                 StrictNodes 1
-                TransPort {tport} #IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort
-                DNSPort 53 
+                TransPort {tport} IsolateClientAddr IsolateClientProtocol IsolateDestAddr IsolateDestPort
+                DNSPort 5353
         """.format(
                 tport=tport if tport is not None else 9040
             )
@@ -292,6 +297,8 @@ class Darknet:
         self.__check_if_root()
         torrc = args.torrc
         port = args.port
+        print("Syncing your clock...")
+        self.__ntpsync()
         if args.start is True:
             print("[{}] Checking for SELinux".format(self._timer))
             print("SELinux Disabled Temporarily") if self.__sel(0) else print("SELinux not Found!")
