@@ -76,10 +76,6 @@ class Darknet:
         signal.signal(signal.SIGINT, self.__handle_sigint)
         self.__check_if_tor_installed()
 
-    def __ntpsync(self) -> None:
-        #subprocess.call(shlex.split("sudo ntpdate -s time.nist.gov"))
-        pass
-
     def __check_if_linux(self) -> None:
         if "linux" not in sys.platform:
             raise UnsupportedOS("You need a Linux distro to run this program")
@@ -297,8 +293,6 @@ class Darknet:
         self.__check_if_root()
         torrc = args.torrc
         port = args.port
-        print("Syncing your clock...")
-        self.__ntpsync()
         if args.start is True:
             print("[{}] Checking for SELinux".format(self._timer))
             print("SELinux Disabled Temporarily") if self.__sel(0) else print("SELinux not Found!")
