@@ -1,73 +1,103 @@
 # darknet.py - Network Anonymization Tool
 
 ## What is darknet.py
-darknet.py is a network application with no dependencies other than Python and TOR, to anonymize the traffic of linux servers and workstations. 
 
-The action darknet.py performs is to redirect all traffic via SOCKS5 (TOR) Proxy.
+darknet.py is a network application with no dependencies other than Python and TOR, useful to anonymize the traffic of linux servers and workstations. 
 
-DNS requests are also anonymized and darknet.py makes DNSLeak almost impossible.
+The action darknet.py performs is to redirect all traffic via SOCKS5 (TOR) Proxy using the Transparent Proxy Method.
+
+DNS requests are also anonymized and darknet.py makes DNS Leak almost impossible.
+
+## Compatibility
+
+The compatibility of darknet.py is verified on all RHEL distributions such as Fedora and CentOS. Debian/Ubuntu/Mint are also supported.
+
+SELinux is temporarily disabled when darknet.py is started.
 
 ## Requirements
-To run darknet.py you need TOR.
 
-Install TOR with your package manager.
-
-NetworkManager is a mandatory requirement for the use of darknet.py
-
-Install NetworkManager with your package manager.
+To use darknet.py you need a Linux distribution with:
+- Python3.7
+- TOR
+- NetworkManager
+- IPTables
 
 ## How Can I Install darknet.py on Linux?
 Download
 
-`git clone https://github.com/multiversecoder/darknet.py `
+`$ git clone https://github.com/multiversecoder/darknet.py `
 
-`cd darknet.py`
+`$ cd darknet.py`
 
 In the darknet.py folder use the ./install.sh to install the software
 
-`chmod +x install.sh`
+`$ chmod +x install.sh`
 
-`sudo ./install.sh`
+`$ sudo ./install.sh`
+
+## Features
+
+- Ease of use
+- MAC address spoofing
+- Compatibility with Linux Distros
+- Security against DNS Leaks
+- No need to use external libraries (Python)
 
 ## Usage
+To start darknet.py without special configurations use the command:
+    
+`$ sudo darknet.py --start --torid <YOUR_TOR_ID>`
+    
+To start darknet.py in stealth mode to change the MAC Address of the interfaces, use the command:
+    
+`$ sudo darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0]`
+    
+To end the darknet.py anonymisation session, use the command:
 
-usage: 
-
-    normal mode
-    
-       ./darknet --start --torid 104
-    
-    stealth mode
-    
-        ./darknet --stealth --torid 104 --ifaces [enp1s0]
-    
-    stopping
-    
-        ./darknet --stop
+`$ sudo darknet.py --stop`
 
 NOTES:
     
     <interface(s)> should be added as python list [wlo1, ...]
 
-DISCLAIMER:
-    
-    The author of this software assumes no responsibility for the use of this software to perform actions that do not comply with the law or damage property or individuals.
-    Using this software you take full responsibility for your actions.
 
-optional arguments:
+## Optional darknet.py arguments:
   
-  -h, --help       show this help message and exit
+  -h, --help | show this help message and exit
 
-  --start          Starts the transparent proxy
+  --start | Starts the transparent proxy
 
-  --stealth        Changes MAC Address and Starts the transparent proxy
+  --stealth | Changes MAC Address and Starts the transparent proxy
 
-  --stop           Stop the execution and reset configurations
+  --stop | Stop the execution and reset configurations
 
-  --torrc TORRC    The location of torrc config file
+  --torrc TORRC | Sets the location of torrc config file
 
-  --torid TORID    The TOR Process ID
+  --torid TORID | Sets the TOR Process ID
 
-  --port PORT      The tor service port
+  --port PORT | Sets the TOR transport port
 
-  --ifaces IFACES  Add interfaces to change mac address
+  --ifaces IFACES | Add interfaces to change mac address
+  
+## Finding your TOR ID
+
+From the terminal run:
+    
+`id -u (TOR username)`
+    
+Finding ID of Default TOR User on RHEL/CentOS/Fedora:
+
+`id -u toranon`
+
+Finding ID of Default TOR User on Debian/Ubuntu/Mint:
+
+`id -u debian-tor`
+
+Finding ID of Default TOR User on ARCH:
+
+`id -u tor`
+
+## DISCLAIMER:
+    
+The author of this software assumes no responsibility for the use of this software to perform actions that do not comply with the law or damage property or individuals.
+Using this software you take full responsibility for your actions.
