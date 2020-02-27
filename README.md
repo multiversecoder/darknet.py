@@ -30,6 +30,7 @@ To use darknet.py you need a Linux distribution with:
 - TOR
 - NetworkManager
 - IPTables
+- CURL
 
 ## How Can I Install darknet.py on Linux?
 Download
