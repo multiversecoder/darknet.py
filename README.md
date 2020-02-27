@@ -84,10 +84,22 @@ NOTES:
   --torrc TORRC | Sets the location of torrc config file
 
   --torid TORID | Sets the TOR Process ID
+  
+  --tpass TPASS | The TOR Controll Password (Enables Control Port)
 
   --port PORT | Sets the TOR transport port
 
   --ifaces IFACES | Add interfaces to change mac address
+  
+  --remove | Removes the current installation of darknet.py from the system
+  
+  --no5 | Exludes Nodes from 5 eyes countries
+  
+  --no9 | Exludes Nodes from 9 eyes countries
+  
+  --no14 | Exludes Nodes from 14 eyes countries
+  
+  --no14p | Exludes Nodes from 14 eyes countries + Others
   
 ## Finding your TOR ID
 
