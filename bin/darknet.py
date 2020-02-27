@@ -66,13 +66,13 @@ parser.add_argument(
 parser.add_argument(
     "--torrc", help="The location of torrc config file", type=str)
 parser.add_argument("--torid", help="The TOR Process ID", type=int)
-parser.add_argument("--tpass", help="The TOR Controll Password", type=str)
+parser.add_argument("--tpass", help="The TOR Control Password (Enables Control)", type=str)
 parser.add_argument("--port", help="The tor service port", type=int)
 parser.add_argument(
     "--ifaces", help="Add interfaces to change MAC Address", type=str)
 parser.add_argument(
     "--remove",
-    help="Remove the current installation of darknet.py from the system",
+    help="Removes the current installation of darknet.py from the system",
     action="store_true")
 parser.add_argument(
     "--no5", help="Exludes Nodes from 5 eyes countries", action="store_true")
