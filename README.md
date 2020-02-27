@@ -1,12 +1,20 @@
-# darknet.py - Network Anonymization Tool
+# darknet.py - Network Anonymization Tool 
 
-## What is darknet.py
+## What is darknet.py?
 
 darknet.py is a network application with no dependencies other than Python and TOR, useful to anonymize the traffic of linux servers and workstations. 
 
 The action darknet.py performs is to redirect all traffic via SOCKS5 (TOR) Proxy using the Transparent Proxy Method.
 
 DNS requests are also anonymized and darknet.py makes DNS Leak almost impossible.
+
+## When to use darknet.py?
+
+darknet.py can be used under any circumstances that require a mandatory anonymity requirement. The cases could be different: From Scraping to the prevention of attacks on Servers with Critical Information, or the communication in total anonymity through the programs of daily use.
+
+The creator's hope is that it will be used to improve people's privacy.
+
+It is up to the user to decide what to do with it.
 
 ## Compatibility
 
@@ -17,6 +25,7 @@ SELinux is temporarily disabled when darknet.py is started.
 ## Requirements
 
 To use darknet.py you need a Linux distribution with:
+
 - Python3.7
 - TOR
 - NetworkManager
@@ -44,6 +53,7 @@ In the darknet.py folder use the ./install.sh to install the software
 - No need to use external libraries (Python)
 
 ## Usage
+
 To start darknet.py without special configurations use the command:
     
 `$ sudo darknet.py --start --torid <YOUR_TOR_ID>`
