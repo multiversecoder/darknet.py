@@ -85,7 +85,7 @@ NOTES:
 
   --torid TORID | Sets the TOR Process ID
   
-  --tpass TPASS | The TOR Controll Password (Enables Control Port)
+  --tpass TPASS | The TOR Control Password (Enables Control Port)
 
   --port PORT | Sets the TOR transport port
 
