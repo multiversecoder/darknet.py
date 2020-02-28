@@ -351,8 +351,8 @@ class Darknet:
         /usr/sbin/iptables -t nat -F
         /usr/sbin/iptables -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
         /usr/sbin/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
-        iptables -A INPUT -i lo -j ACCEPT
-        iptables -A OUTPUT -o lo -j ACCEPT
+        /usr/sbin/iptables -A INPUT -i lo -j ACCEPT
+        /usr/sbin/iptables -A OUTPUT -o lo -j ACCEPT
         for NET in {nontor}; do
             /usr/sbin/iptables -t nat -A OUTPUT -d $NET -j RETURN
         done
