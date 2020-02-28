@@ -94,13 +94,13 @@ NOTES:
   
   --remove | Removes the current installation of darknet.py from the system
   
-  --no5 | Exludes Nodes from 5 eyes countries
+  --no5 | Excludes Nodes from 5 eyes countries
   
-  --no9 | Exludes Nodes from 9 eyes countries
+  --no9 | Excludes Nodes from 9 eyes countries
   
-  --no14 | Exludes Nodes from 14 eyes countries
+  --no14 | Excludes Nodes from 14 eyes countries
   
-  --no14p | Exludes Nodes from 14 eyes countries + Others
+  --no14p | Excludes Nodes from 14 eyes countries + Others
   
 ## Finding your TOR ID
 
