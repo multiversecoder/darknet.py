@@ -2,9 +2,9 @@
 
 ## What is darknet.py?
 
-darknet.py is a network application with no dependencies other than Python and TOR, useful to anonymize the traffic of linux servers and workstations. 
+darknet.py is a network application with no dependencies other than Python and Tor, useful to anonymize the traffic of linux servers and workstations. 
 
-The action darknet.py performs is to redirect all traffic via SOCKS5 (TOR) Proxy using the Transparent Proxy Method.
+The action darknet.py performs is to redirect all traffic via SOCKS5 (Tor) Proxy using the Transparent Proxy Method.
 
 DNS requests are also anonymized and darknet.py makes DNS Leak almost impossible.
 
@@ -27,7 +27,7 @@ SELinux is temporarily disabled when darknet.py is started.
 To use darknet.py you need a Linux distribution with:
 
 - Python3.7
-- TOR
+- Tor
 - NetworkManager
 - IPTables
 - CURL
@@ -57,11 +57,11 @@ In the darknet.py folder use the ./install.sh to install the software
 
 To start darknet.py without special configurations use the command:
     
-`$ sudo darknet.py --start --torid <YOUR_TOR_ID>`
+`$ sudo darknet.py --start --torid <YOUR_Tor_ID>`
     
 To start darknet.py in stealth mode to change the MAC Address of the interfaces, use the command:
     
-`$ sudo darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0]`
+`$ sudo darknet.py --stealth --torid <YOUR_Tor_ID> --ifaces [enp1s0]`
     
 To end the darknet.py anonymisation session, use the command:
 
@@ -82,13 +82,13 @@ NOTES:
 
   --stop | Stop the execution and reset configurations
 
-  --torrc TORRC | Sets the location of torrc config file
+  --torrc TorRC | Sets the location of torrc config file
 
-  --torid TORID | Sets the TOR Process ID
+  --torid TorID | Sets the Tor Process ID
   
-  --tpass TPASS | The TOR Control Password (Enables Control Port)
+  --tpass TPASS | The Tor Control Password (Enables Control Port)
 
-  --port PORT | Sets the TOR transport port
+  --port PORT | Sets the Tor transport port
 
   --ifaces IFACES | Add interfaces to change mac address
   
@@ -102,21 +102,21 @@ NOTES:
   
   --no14p | Excludes Nodes from 14 eyes countries + Others
   
-## Finding your TOR ID
+## Finding your Tor ID
 
 From the terminal run:
     
-`id -u (TOR username)`
+`id -u (Tor username)`
     
-Finding ID of Default TOR User on RHEL/CentOS/Fedora:
+Finding ID of Default Tor User on RHEL/CentOS/Fedora:
 
 `id -u toranon`
 
-Finding ID of Default TOR User on Debian/Ubuntu/Mint:
+Finding ID of Default Tor User on Debian/Ubuntu/Mint:
 
 `id -u debian-tor`
 
-Finding ID of Default TOR User on ARCH:
+Finding ID of Default Tor User on ARCH:
 
 `id -u tor`
 
