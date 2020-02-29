@@ -20,22 +20,22 @@ from urllib.request import urlopen
 
 USAGE = """
     normal mode
-        $ darknet.py --start --torid <YOUR_TOR_ID>
+        $ darknet.py --start --torid <YOUR_Tor_ID>
 
     normal mode outside 5,9,14 eyes
-        $ darknet.py --start --torid <YOUR_TOR_ID> --no5
-        $ darknet.py --start --torid <YOUR_TOR_ID> --no9
-        $ darknet.py --start --torid <YOUR_TOR_ID> --no14
-        $ darknet.py --start --torid <YOUR_TOR_ID> --no14p
+        $ darknet.py --start --torid <YOUR_Tor_ID> --no5
+        $ darknet.py --start --torid <YOUR_Tor_ID> --no9
+        $ darknet.py --start --torid <YOUR_Tor_ID> --no14
+        $ darknet.py --start --torid <YOUR_Tor_ID> --no14p
 
     stealth mode
-        $ darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0]
+        $ darknet.py --stealth --torid <YOUR_Tor_ID> --ifaces [enp1s0]
 
     stealth mode outside 5,9,14 eyes
-        $ darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0] --no5
-        $ darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0] --no9
-        $ darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0] --no14
-        $ darknet.py --stealth --torid <YOUR_TOR_ID> --ifaces [enp1s0] --no14p
+        $ darknet.py --stealth --torid <YOUR_Tor_ID> --ifaces [enp1s0] --no5
+        $ darknet.py --stealth --torid <YOUR_Tor_ID> --ifaces [enp1s0] --no9
+        $ darknet.py --stealth --torid <YOUR_Tor_ID> --ifaces [enp1s0] --no14
+        $ darknet.py --stealth --torid <YOUR_Tor_ID> --ifaces [enp1s0] --no14p
 
     stopping
         $ darknet.py --stop
@@ -65,8 +65,8 @@ parser.add_argument(
     action="store_true")
 parser.add_argument(
     "--torrc", help="The location of torrc config file", type=str)
-parser.add_argument("--torid", help="The TOR Process ID", type=int)
-parser.add_argument("--tpass", help="The TOR Control Password (Enables Control)", type=str)
+parser.add_argument("--torid", help="The Tor Process ID", type=int)
+parser.add_argument("--tpass", help="The Tor Control Password (Enables Control)", type=str)
 parser.add_argument("--port", help="The tor service port", type=int)
 parser.add_argument(
     "--ifaces", help="Add interfaces to change MAC Address", type=str)
@@ -79,7 +79,8 @@ parser.add_argument(
 parser.add_argument(
     "--no9", help="Excludes Nodes from 9 eyes countries", action="store_true")
 parser.add_argument(
-    "--no14", help="Excludes Nodes from 14 eyes countries", action="store_true")
+    "--no14", help="Excludes Nodes from 14 eyes countries",
+    action="store_true")
 parser.add_argument(
     "--no14p",
     help="Excludes Nodes from 14 eyes countries + Others",
@@ -101,11 +102,12 @@ NO14EYESPLUS = NO14EYES.replace("{JP},", "").replace(
     "{KR},", "").replace("{IL},", "").replace("{SG},", "")
 
 
+
 class PermissionDenied(Exception):
     pass
 
 
-class TORNotInstalled(Exception):
+class TorNotInstalled(Exception):
     pass
 
 
@@ -117,7 +119,7 @@ class CURLNotInstalled(Exception):
     pass
 
 
-class MissingTORID(Exception):
+class MissingTorID(Exception):
     pass
 
 
@@ -143,6 +145,7 @@ class Darknet:
         Using this software you take full responsibility for your actions
         run darknet.py -h to see help, full disclaimer or usage
         """
+        self.__check_if_root()
         self.__check_if_linux()
         self.__check_if_tor_installed()
         self.__check_if_curl_installed()
@@ -223,7 +226,7 @@ class Darknet:
 
     def __check_if_tor_installed(self) -> None:
         """
-        Checks if TOR is Installed using shutil.which
+        Checks if Tor is Installed using shutil.which
 
         Returns
         -------
@@ -231,11 +234,11 @@ class Darknet:
 
         Raises
         ------
-            TORNotInstalled if TOR package is not installed
+            TorNotInstalled if Tor package is not installed
         """
         if bool(shutil.which("tor")) is False:
-            raise TORNotInstalled(
-                "TOR not installed... Please install TOR")
+            raise TorNotInstalled(
+                "Tor not installed... Please install Tor")
 
     def __check_if_nm_installed(self) -> None:
         """
@@ -250,7 +253,7 @@ class Darknet:
             NMNotInstalled if NetworkManager package is not installed
         """
         if bool(shutil.which("NetworkManager")) is False:
-            raise TORNotInstalled(
+            raise TorNotInstalled(
                 "NetworkManager not installed... Please install NetworkManager")
 
     def __check_if_curl_installed(self) -> None:
@@ -303,7 +306,7 @@ class Darknet:
     def __check_ip_addr(self)-> str:
         """
         Checks the IP Address of your Workstation/Server
-        If TOR is enabled checks https://check.torproject.org
+        If Tor is enabled checks https://check.torproject.org
         else https://ipinfo.io/ip
 
         Returns
@@ -312,12 +315,12 @@ class Darknet:
         """
 
         if self.__has_internet_connection and self.has_tor:
-            return "TOR is enabled\n {}".format(
+            return "Tor is enabled\n {}".format(
                 subprocess.getoutput(
                     "curl -s https://check.torproject.org/ | cat | grep -m 1 IP | xargs | sed 's/<[^>]*>//g'")
             )
         elif self.__has_internet_connection and not self.has_tor:
-            return "TOR is disabled\nYour IP address appears to be: {}".format(
+            return "Tor is disabled\nYour IP address appears to be: {}".format(
                 subprocess.getoutput("curl -s https://ipinfo.io/ip"))
 
     @property
@@ -338,9 +341,9 @@ class Darknet:
 
         Parameters
         ----------
-            torid:  int = TOR user ID
-            tport:  int = TOR transport Port
-            nontor: str = All Address that should be not routed wth TOR
+            torid:  int = Tor user ID
+            tport:  int = Tor transport Port
+            nontor: str = All Address that should be not routed wth Tor
 
         Returns
         -------
@@ -393,7 +396,7 @@ class Darknet:
 
     def __gen_tpass(self, psw: str) -> str:
         """
-        Generates a TOR Control Password
+        Generates a Tor Control Password
 
         Parameters
         ----------
@@ -401,7 +404,7 @@ class Darknet:
 
         Returns
         -------
-            str = Hashed Password using --hash-password command from TOR
+            str = Hashed Password using --hash-password command from Tor
         """
         return subprocess.check_output(
             shlex.split(
@@ -411,17 +414,17 @@ class Darknet:
 
     def __torrc_file(self, tport: int, cs: str, tpass: str) -> str:
         """
-        Generates a Secure TORRC Configuration File
+        Generates a Secure torrc Configuration File
 
         Parameters
         ----------
-            tport:  int = The TOR Transport Port
+            tport:  int = The Tor Transport Port
             cs:     str = Country List
-            tpass:  str = The Hashed Password For TOR Control
+            tpass:  str = The Hashed Password For Tor Control
 
         Returns
         -------
-            str = The TORRC File that should be saved on /etc/tor/torrc
+            str = The torrc File that should be saved on /etc/tor/torrc
 
         """
         print("Exit Nodes from 14 eyes countries are blocked by default")
@@ -447,7 +450,8 @@ class Darknet:
         """.format(
                 tport=tport if tport is not None else 9040,
                 cs=cs if cs is not None else COUNTRIES,
-                tc=inspect.cleandoc("""
+                tc=inspect.cleandoc(
+                    """
                     ControlPort 9052
                     CookieAuthentication 1
                     HashedControlPassword {tpass}
@@ -496,18 +500,18 @@ class Darknet:
                 "/sbin/ip link set {} up".format(interface)))
             print("{} MAC Addresses changed for interface: {} => {} ".format(
                 self._timer, interface, macaddr))
-            print("{} Reloading Network Manager".format(self._timer))
+            print("{} Reloading NetworkManager".format(self._timer))
             subprocess.call(shlex.split("systemctl reload NetworkManager"))
             time.sleep(10)
         print("[done]")
 
     def __set_torrc_config(self, torrc_content: str) -> None:
         """
-        Saves TORRC Content into /etc/tor/torrc
+        Saves torrc Content into /etc/tor/torrc
 
         Parameters
         ----------
-            torrc_content : str = The TORRC gen by self.__torrc_file
+            torrc_content : str = The torrc gen by self.__torrc_file
 
         Returns
         -------
@@ -532,14 +536,14 @@ class Darknet:
     def __torrc_config(self, torrc: str, tport: int = None, cs: str = None,
         tpass: str = None) -> None:
         """
-        Configures the new TORRC File
-        Backups Original TORRC File found in /etc/tor
+        Configures the new torrc File
+        Backups Original torrc File found in /etc/tor
 
         Parameters
         ----------
-            tport:  int = The TOR Transport Port
+            tport:  int = The Tor Transport Port
             cs:     str = Country List
-            tpass:  str = The Hashed Password For TOR Control
+            tpass:  str = The Hashed Password For Tor Control
 
         Returns
         -------
@@ -561,8 +565,8 @@ class Darknet:
 
     def __torrc_reset(self) -> None:
         """
-        Removes Generated TORRC Content
-        Restore TORRC File found in /etc/tor/ before darknet.py
+        Removes Generated torrc Content
+        Restore torrc File found in /etc/tor/ before darknet.py
 
         Returns
         -------
@@ -619,8 +623,7 @@ class Darknet:
     def restart_tor(self) -> None:
         subprocess.call(shlex.split("systemctl restart tor.service"))
 
-    def start(self, torid: int, torrc: str = None, port: int = None, cs: str = None,
-        tpass: str = None) -> None:
+    def start(self, args) -> None:
 
         print("Hardering System...")
         self.__ip4f()
@@ -629,19 +632,31 @@ class Darknet:
         print("{} Checking for SELinux".format(self._timer))
         print("SELinux Disabled Temporarily") if self.__sel(
             0) else print("SELinux not Found!")
-        self.__torrc_config(torrc, port, cs, tpass)
+
+        if args.no5 is True:
+            self.__torrc_config(args.torrc, args.port, NO5EYES, args.tpass)
+        elif args.no9 is True:
+            self.__torrc_config(args.torrc, args.port, NO9EYES, args.tpass)
+        elif args.no14 is True:
+            self.__torrc_config(args.torrc, args.port, NO14EYES, args.tpass)
+        elif args.no14p is True:
+            self.__torrc_config(
+                args.torrc, args.port, NO14EYESPLUS, args.tpass)
+        else:
+            self.__torrc_config(args.torrc, args.port, COUNTRIES, args.tpass)
+
         self.__resolv_config
-        print("{} Starting TOR service...".format(self._timer))
+        print("{} Starting Tor service...".format(self._timer))
         self.restart_tor()
         time.sleep(3)
         print("[done]")
         print("{} Setting Up Firewall Rules".format(self._timer))
-        iptables = self.__set_iptables_rules(torid=torid, tport=port)
+        iptables = self.__set_iptables_rules(torid=args.torid, tport=args.port)
         _ = subprocess.check_output(iptables, shell=True)
         time.sleep(10)
         print("[done]")
         print(
-            "{} Checking the IP Address Obtained from TOR".format(
+            "{} Checking the IP Address Obtained from Tor".format(
                 self._timer))
         print(self.__check_ip_addr)
 
@@ -653,10 +668,10 @@ class Darknet:
         _ = subprocess.check_output(flush, shell=True)
         print("[done]")
         time.sleep(10)
-        print("{} Reloading Network Manager".format(self._timer))
+        print("{} Reloading NetworkManager".format(self._timer))
         subprocess.call(shlex.split("systemctl reload NetworkManager"))
         time.sleep(10)
-        print("{} Resetting TOR Service".format(self._timer))
+        print("{} Resetting Tor Service".format(self._timer))
         self.__torrc_reset()
         self.restart_tor()
         time.sleep(1)
@@ -675,82 +690,29 @@ class Darknet:
 
         print(self.logo)
 
-        self.__check_if_root()
-
         if args.start is True:
 
-            if args.torid is not None:
-                torid = args.torid
-            else:
-                raise MissingTORID(
-                "Missing TOR Process ID. To get it run '$ id -u <name of your TOR user>'")
+            if args.torid is None:
+                raise MissingTorID(
+                "Missing Tor Process ID. To get it run '$ id -u <name of your Tor user>'")
 
-            # Sets Countries and other things and start
-
-            if args.no5 is True:
-                print("Running darknet.py outside 5 eyes countries")
-                self.start(torid=torid, torrc=args.torrc, port=args.port,
-                           cs=NO5EYES, tpass=args.tpass)
-
-            elif args.no9 is True:
-                print("Running darknet.py outside 9 eyes countries")
-                self.start(torid=torid, torrc=args.torrc, port=args.port,
-                           cs=NO9EYES, tpass=args.tpass)
-
-            elif args.no14 is True:
-                print("Running darknet.py outside 14 eyes countries")
-                self.start(torid=torid, torrc=args.torrc, port=args.port,
-                           cs=NO14EYES, tpass=args.tpass)
-
-            elif args.no14p is True:
-                print("Running darknet.py outside 14+ eyes countries")
-                self.start(torid=torid, torrc=args.torrc, port=args.port,
-                           cs=NO14EYESPLUS, tpass=args.tpass)
-            else:
-                self.start(torid=torid, torrc=args.torrc, port=args.port,
-                           cs=COUNTRIES, tpass=args.tpass)
+            self.start(args)
 
         if args.stealth is True:
 
-            if args.torid is not None:
-                torid = args.torid
-            else:
-                raise MissingTORID(
-                "Missing TOR Process ID. To get it run '$ id -u <name of your TOR user>'")
+            if args.torid is None:
+                raise MissingTorID(
+                "Missing Tor Process ID. To get it run '$ id -u <name of your Tor user>'")
 
             if args.ifaces is not None:
                 self.__change_mac_addr(
                     [f"{interface.strip(' ')}" for interface in args.ifaces.replace(
                         "[", "").replace("]", "").split(",")])
-
-                # Sets Countries and other things and start
-
-                if args.no5 is True:
-                    print("Running darknet.py outside 5 eyes countries")
-                    self.start(torid=torid, torrc=args.torrc, port=args.port,
-                               cs=NO5EYES, tpass=args.tpass)
-
-                elif args.no9 is True:
-                    print("Running darknet.py outside 9 eyes countries")
-                    self.start(torid=torid, torrc=args.torrc, port=args.port,
-                               cs=NO9EYES, tpass=args.tpass)
-
-                elif args.no14 is True:
-                    print("Running darknet.py outside 14 eyes countries")
-                    self.start(torid=torid, torrc=args.torrc, port=args.port,
-                               cs=NO14EYES, tpass=args.tpass)
-
-                elif args.no14p is True:
-                    print("Running darknet.py outside 14+ eyes countries")
-                    self.start(torid=torid, torrc=args.torrc, port=args.port,
-                               cs=NO14EYESPLUS, tpass=args.tpass)
-
-                else:
-                    self.start(torid=torid, torrc=args.torrc, port=args.port,
-                               cs=COUNTRIES, tpass=args.tpass)
             else:
                 raise MissingInterfacesForStealthMode(
                 "To change MAC you need to pass interfaces")
+
+            self.start(args)
 
         if args.stop is True:
             self.stop()
