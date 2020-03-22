@@ -402,7 +402,7 @@ class Darknet:
             {ipt_loc} -t mangle -F
             {ipt_loc} -F
             {ipt_loc} -X
-        """.format(self.ipt_loc)
+        """.format(ipt_loc=self.ipt_loc)
 
     def __gen_tpass(self, psw: str) -> str:
         """
