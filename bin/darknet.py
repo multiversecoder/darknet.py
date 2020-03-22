@@ -150,6 +150,7 @@ class Darknet:
         self.__check_if_tor_installed()
         self.__check_if_curl_installed()
         self.__check_if_nm_installed()
+        self.__assign()
         signal.signal(signal.SIGINT, self.__handle_sigint)
 
     def __check_if_root(self) -> None:
@@ -166,6 +167,13 @@ class Darknet:
         """
         if os.getuid() != 0:
             raise PermissionDenied("You must be root to run this program")
+
+    def __assign(self) -> None:
+        """
+
+        """
+        self.ipt_loc = shutil.which("iptables")
+        self.ipbin = shutil.which("ip")
 
     def __check_if_linux(self) -> None:
         """
@@ -349,31 +357,33 @@ class Darknet:
         -------
             str = IPTables Commands
         """
+
         return """
-        /usr/sbin/iptables -F
-        /usr/sbin/iptables -t nat -F
-        /usr/sbin/iptables -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
-        /usr/sbin/iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
-        /usr/sbin/iptables -A INPUT -i lo -j ACCEPT
-        /usr/sbin/iptables -A OUTPUT -o lo -j ACCEPT
+        {ipt_loc} -F
+        {ipt_loc} -t nat -F
+        {ipt_loc} -t nat -A OUTPUT -m owner --uid-owner {torid} -j RETURN
+        {ipt_loc} -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 5353
+        {ipt_loc} -A INPUT -i lo -j ACCEPT
+        {ipt_loc} -A OUTPUT -o lo -j ACCEPT
         for NET in {nontor}; do
-            /usr/sbin/iptables -t nat -A OUTPUT -d $NET -j RETURN
+            {ipt_loc} -t nat -A OUTPUT -d $NET -j RETURN
         done
-        /usr/sbin/iptables -t nat -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports {tport}
-        /usr/sbin/iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
-        /usr/sbin/iptables -A OUTPUT -p icmp --icmp-type echo-request -j DROP
-        /usr/sbin/iptables -A INPUT -m state --state RELATED -j DROP
-        /usr/sbin/iptables -A OUTPUT -m state --state RELATED -j DROP
-        /usr/sbin/iptables -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
+        {ipt_loc} -t nat -A OUTPUT -p tcp --tcp-flags FIN,SYN,RST,ACK SYN -j REDIRECT --to-ports {tport}
+        {ipt_loc} -A INPUT -p icmp --icmp-type echo-request -j DROP
+        {ipt_loc} -A OUTPUT -p icmp --icmp-type echo-request -j DROP
+        {ipt_loc} -A INPUT -m state --state RELATED -j DROP
+        {ipt_loc} -A OUTPUT -m state --state RELATED -j DROP
+        {ipt_loc} -A OUTPUT -m state --state ESTABLISHED -j ACCEPT
         for NET in {nontor}; do
-            /usr/sbin/iptables -A OUTPUT -d $NET -j ACCEPT
+            {ipt_loc} -A OUTPUT -d $NET -j ACCEPT
         done
-        /usr/sbin/iptables -A OUTPUT -m owner --uid-owner {torid} -j ACCEPT
-        /usr/sbin/iptables -A OUTPUT -j DROP
+        {ipt_loc} -A OUTPUT -m owner --uid-owner {torid} -j ACCEPT
+        {ipt_loc} -A OUTPUT -j DROP
         """.format(
             torid=torid,
             tport=tport if tport is not None else 9040,
-            nontor=nontor)
+            nontor=nontor,
+            ipt_loc=self.ipt_loc)
 
     def __unset_iptables_rules(self) -> str:
         """
@@ -385,14 +395,14 @@ class Darknet:
             str = IPTABles Commands
         """
         return """
-            /usr/sbin/iptables -P INPUT ACCEPT
-            /usr/sbin/iptables -P FORWARD ACCEPT
-            /usr/sbin/iptables -P OUTPUT ACCEPT
-            /usr/sbin/iptables -t nat -F
-            /usr/sbin/iptables -t mangle -F
-            /usr/sbin/iptables -F
-            /usr/sbin/iptables -X
-        """
+            {ipt_loc} -P INPUT ACCEPT
+            {ipt_loc} -P FORWARD ACCEPT
+            {ipt_loc} -P OUTPUT ACCEPT
+            {ipt_loc} -t nat -F
+            {ipt_loc} -t mangle -F
+            {ipt_loc} -F
+            {ipt_loc} -X
+        """.format(self.ipt_loc)
 
     def __gen_tpass(self, psw: str) -> str:
         """
@@ -476,7 +486,7 @@ class Darknet:
         """
         Changes MAC Address in every Network Interface passed
         interfaces param
-        This command use /usr/sbin/ip to modify interfaces
+        This command use ip command to modify interfaces
 
         Parameters
         ----------
@@ -490,14 +500,14 @@ class Darknet:
         for interface in interfaces:
             print("{} Changing: {}".format(self._timer, interface))
             subprocess.call(shlex.split(
-                "/sbin/ip link set {} down".format(interface)))
+                "{ipbin} link set {iface} down".format(ipbin=self.ipbin, iface=interface)))
             time.sleep(5)
             macaddr = self.__random_mac_address
             subprocess.call(shlex.split(
-                "/sbin/ip link set {} address {}".format(interface, macaddr)))
+                "{ipbin} link set {iface} address {mac}".format(ipbin=self.ipbin, iface=interface, mac=macaddr)))
             time.sleep(5)
             subprocess.call(shlex.split(
-                "/sbin/ip link set {} up".format(interface)))
+                "{ipbin} link set {iface} up".format(ipbin=self.ipbin, iface=interface)))
             print("{} MAC Addresses changed for interface: {} => {} ".format(
                 self._timer, interface, macaddr))
             print("{} Reloading NetworkManager".format(self._timer))
