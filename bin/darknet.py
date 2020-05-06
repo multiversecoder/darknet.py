@@ -189,6 +189,18 @@ class Darknet:
         """
         if "linux" not in sys.platform:
             raise UnsupportedOS("You need a Linux distro to run this program")
+    
+    def __noipv6(self) -> None:
+        """
+        Disables Kernel IPv6 Forwarding
+
+        Returns
+        -------
+            None
+
+        """
+        subprocess.call(shlex.split("sysctl -w net.ipv6.conf.all.disable_ipv6=1"))
+        subprocess.call(shlex.split("sysctl -w net.ipv6.conf.default.disable_ipv6=1"))
 
     def __ip4f(self) -> None:
         """
@@ -637,6 +649,7 @@ class Darknet:
 
         print("Hardering System...")
         self.__ip4f()
+        self.__noipv6()
         self.__icmp()
         self.__mtp()
         print("{} Checking for SELinux".format(self._timer))
