@@ -706,7 +706,7 @@ class Darknet:
         print("SELinux Enabled") if self.__sel(
             1) else print("SELinux not Found!")
         print(
-            "darknet.py disabled. You may need to Restart your Machine to revert some changes!")
+            "darknet.py disabled. You may need to reboot your system to revert some changes!")
 
     def run(self, args) -> None:
         subprocess.call(shlex.split("clear"))
