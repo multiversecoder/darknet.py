@@ -201,6 +201,8 @@ class Darknet:
         """
         subprocess.call(shlex.split("sysctl -w net.ipv6.conf.all.disable_ipv6=1"))
         subprocess.call(shlex.split("sysctl -w net.ipv6.conf.default.disable_ipv6=1"))
+        subprocess.call(shlex.split("sysctl -w net.ipv6.conf.lo.disable_ipv6=1"))
+
 
     def __ip4f(self) -> None:
         """
@@ -682,6 +684,28 @@ class Darknet:
             "{} Checking the IP Address Obtained from Tor".format(
                 self._timer))
         print(self.__check_ip_addr)
+        print(inspect.cleandoc(
+            """
+            \033[1;31mWarning:\033[0m
+
+                If you plan to browse the web using darknet.py and Tor using a common browser
+                YOU NEED to disable WebRTC to prevent potential leaks of your real IP Address.
+                
+            \033[1;33mAdvices:\033[0m:
+
+                1 => Do not use Chrome because there are no official methods to
+                     disable WebRTC
+                
+                2 => Use Firefox or an alternative that supports disabling WebRTC
+
+            Firefox Solution:
+
+                1 => Visit "about:config" from the address bar and hit Enter
+                2 => Click on "I Accept the risk"
+                3 => Type "media.peerconnection.enabled" in the search bar
+                4 => Set the value to false
+            """
+        ))
 
     def stop(self) -> None:
         print("{} STOPPING darknet.py".format(self._timer), end=" ")
