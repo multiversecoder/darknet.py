@@ -202,6 +202,17 @@ class Darknet:
         subprocess.call(shlex.split("sysctl -w net.ipv6.conf.all.disable_ipv6=1"))
         subprocess.call(shlex.split("sysctl -w net.ipv6.conf.default.disable_ipv6=1"))
         subprocess.call(shlex.split("sysctl -w net.ipv6.conf.lo.disable_ipv6=1"))
+    
+
+    def __noip4ts(self) -> None:
+        """
+        Disables Kernel IPv4 TCP Timestamps
+
+        Returns
+        -------
+            None
+        """
+        subprocess.call(shlex.split("sysctl -w net.ipv4.tcp_timestamps=0"))
 
 
     def __ip4f(self) -> None:
@@ -651,6 +662,7 @@ class Darknet:
 
         print("Hardering System...")
         self.__ip4f()
+        self.__noip4ts()
         self.__noipv6()
         self.__icmp()
         self.__mtp()
