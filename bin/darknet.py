@@ -286,7 +286,7 @@ class Darknet:
             NMNotInstalled if NetworkManager package is not installed
         """
         if bool(shutil.which("NetworkManager")) is False:
-            raise TorNotInstalled(
+            raise NMNotInstalled(
                 "NetworkManager not installed... Please install NetworkManager")
 
     def __check_if_curl_installed(self) -> None:
