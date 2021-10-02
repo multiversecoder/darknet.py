@@ -1,3 +1,7 @@
+**This repository has been archived as it was poorly developed during a very confusing time.**
+
+For a better version: [hidemego](https://github.com/multiversecoder/hidemego)
+
 # darknet.py - Network Anonymization Tool 
 
 ## What is darknet.py?
